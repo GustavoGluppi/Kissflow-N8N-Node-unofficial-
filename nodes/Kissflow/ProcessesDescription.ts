@@ -47,7 +47,7 @@ const getItemDetailsOperation: INodeProperties[] = [
 		displayName: 'Instance ID',
 		name: 'instanceId',
 		default: '',
-		description: "The request's query parameters",
+		description: "The item's unique identifier",
 		displayOptions: {
 			show: {
 				resource: ['process'],
