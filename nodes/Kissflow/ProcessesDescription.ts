@@ -16,13 +16,13 @@ export const processOperations: INodeProperties[] = [
 				name: 'Get Item Details',
 				value: 'getItemDetails',
 				description: 'Retrieves the details of a specific item from your process',
+				action: 'Get item details',
 				routing: {
 					request: {
 						method: 'GET',
-						url: '={{"/process/2/" + $credentials["accountId"] + "/admin/" + $parameter["processId"] + "/" + $parameter["instanceId"]}}',
+						url: '=/process/2/{{$credentials["accountId"]}}/admin/{{$parameter["processId"]}}/{{$parameter["instanceId"]}}', //'={{ "/process/2/" + $credentials["accountId"] + "/admin/" + $parameter["processId"] + "/" + $parameter["instanceId"] }}',
 					},
 				},
-				action: 'Get item details',
 			},
 		],
 		default: 'getItemDetails',

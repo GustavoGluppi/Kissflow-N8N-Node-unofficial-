@@ -5,7 +5,8 @@ export class KissflowUnofficial implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Kissflow (unofficial)',
 		name: 'kissflowUnofficial',
-		icon: 'file:Kissflow.svg',
+		// eslint-disable-next-line n8n-nodes-base/node-class-description-icon-not-svg
+		icon: 'file:Kissflow_vertical_white.png',
 		group: ['transform'],
 		version: 1,
 		subtitle: 'Kissflow API',
@@ -14,9 +15,9 @@ export class KissflowUnofficial implements INodeType {
 			name: 'Kissflow',
 		},
 		// eslint-disable-next-line n8n-nodes-base/node-class-description-inputs-wrong-regular-node
-		inputs: ['main' as NodeConnectionType],
+		inputs: [NodeConnectionType.Main],
 		// eslint-disable-next-line n8n-nodes-base/node-class-description-outputs-wrong
-		outputs: ['main' as NodeConnectionType],
+		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
 				name: 'KissflowApi',

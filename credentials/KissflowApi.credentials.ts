@@ -1,9 +1,10 @@
-import { IAuthenticateGeneric, ICredentialType, INodeProperties } from 'n8n-workflow';
+import { IAuthenticateGeneric, Icon, ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class KissflowApi implements ICredentialType {
 	// eslint-disable-next-line n8n-nodes-base/cred-class-field-name-uppercase-first-char
 	name = 'KissflowApi';
 	displayName = 'Kissflow API';
+	icon: Icon = 'file:Kissflow-Credential-Icon.png';
 	//documentationUrl = 'https://docs.n8n.io/integrations/creating-nodes/build/declarative-style-node/';
 	properties: INodeProperties[] = [
 		{
