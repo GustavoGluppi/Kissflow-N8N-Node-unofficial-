@@ -1,12 +1,21 @@
-import { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
-import { processOperations, processFields } from './ProcessesDescription';
+import {
+	IExecuteFunctions,
+	INodeExecutionData,
+	INodeType,
+	INodeTypeDescription,
+	IRequestOptions,
+	NodeConnectionType,
+} from 'n8n-workflow';
+import { processFields, processOperations } from './ProcessesDescription';
 
+// Creating node UI and logic
 export class KissflowUnofficial implements INodeType {
+	// Setting node infos, such as UI components
 	description: INodeTypeDescription = {
 		displayName: 'Kissflow (unofficial)',
 		name: 'kissflowUnofficial',
 		// eslint-disable-next-line n8n-nodes-base/node-class-description-icon-not-svg
-		icon: 'file:Kissflow_vertical_white.png',
+		icon: 'file:Kissflow-Node-Icon.png',
 		group: ['transform'],
 		version: 1,
 		subtitle: 'Kissflow API',
@@ -24,6 +33,7 @@ export class KissflowUnofficial implements INodeType {
 				required: true,
 			},
 		],
+		/*
 		requestDefaults: {
 			baseURL: '={{ "https://" + $credentials["subdomain"] + ".kissflow.com"}}',
 			headers: {
@@ -31,6 +41,7 @@ export class KissflowUnofficial implements INodeType {
 				'Content-Type': 'application/json',
 			},
 		},
+		*/
 		properties: [
 			{
 				displayName: 'Resource',
@@ -48,10 +59,54 @@ export class KissflowUnofficial implements INodeType {
 					},
 				],
 				default: 'process',
+				required: true,
 			},
 
 			...processOperations,
 			...processFields,
 		],
 	};
+
+	// Adding node's backend (API requests)
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+		// Handle data coming from previous nodes
+		const items = this.getInputData();
+		let responseData;
+		const returnData = [];
+		const resource = this.getNodeParameter('resource', 0) as string;
+
+		const processesOperations = this.getNodeParameter('processesOperations', 0) as string;
+
+		const credentials = await this.getCredentials('KissflowApi');
+
+		// For each item, make an API call
+		for (let i = 0; i < items.length; i++) {
+			if (resource === 'process') {
+				if (processesOperations === 'getItemDetails') {
+					// Get inputs's values
+					const processId = this.getNodeParameter('processId', i) as string;
+					const instanceId = this.getNodeParameter('instanceId', i) as string;
+
+					// Make HTTP request according to https://api.kissflow.com/
+					const options: IRequestOptions = {
+						method: 'GET',
+						url: `https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/admin/${processId}/${instanceId}`,
+						encoding: 'arrayBuffer',
+					};
+
+					responseData = await this.helpers.requestWithAuthentication.call(
+						this,
+						'KissflowApi',
+						options,
+					);
+
+					console.log(responseData);
+
+					returnData.push(JSON.parse(responseData));
+				}
+			}
+		}
+		// Map data to n8n data structure
+		return [this.helpers.returnJsonArray(returnData)];
+	}
 }
