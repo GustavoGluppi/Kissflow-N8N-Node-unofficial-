@@ -51,6 +51,7 @@ export const getItemDetailsOperation: INodeProperties[] = [
 			},
 		},
 		type: 'string',
+		required: true,
 	},
 ];
 

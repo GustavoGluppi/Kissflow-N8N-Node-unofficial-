@@ -3,10 +3,12 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	IRequestOptions,
 	NodeConnectionType,
 } from 'n8n-workflow';
-import { processFields, processOperations } from './ProcessesDescription';
+import { processFields, processOperations } from './Descriptions/ProcessesDescription';
+import { getItemDetails } from '../../utils/processController';
+import { getCardDetails } from '../../utils/boardController';
+import { boardOperations, boardFields } from './Descriptions/BoardsDescription';
 
 // Creating node UI and logic
 export class KissflowUnofficial implements INodeType {
@@ -33,20 +35,11 @@ export class KissflowUnofficial implements INodeType {
 				required: true,
 			},
 		],
-		/*
-		requestDefaults: {
-			baseURL: '={{ "https://" + $credentials["subdomain"] + ".kissflow.com"}}',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-		},
-		*/
 		// Creating node's fields
 		properties: [
 			// Resource (main) field
 			{
-				displayName: 'Resource',
+				displayName: '🧭 Resource',
 				name: 'resource',
 				type: 'options',
 				noDataExpression: true,
@@ -56,7 +49,7 @@ export class KissflowUnofficial implements INodeType {
 						value: 'process',
 					},
 					{
-						name: '🪟 Board Action',
+						name: '🔲 Board Action',
 						value: 'board',
 					},
 				],
@@ -67,6 +60,10 @@ export class KissflowUnofficial implements INodeType {
 			// "Process Action" fields
 			...processOperations,
 			...processFields,
+
+			// "Board Action" fields
+			...boardOperations,
+			...boardFields,
 		],
 	};
 
@@ -75,39 +72,40 @@ export class KissflowUnofficial implements INodeType {
 		// Handle data coming from previous nodes
 		const items = this.getInputData();
 
-		let responseData;
 		const returnData = [];
 
 		// Gettin' parameters from GUI
 		const resource = this.getNodeParameter('resource', 0) as string;
-		const processesOperations = this.getNodeParameter('processesOperations', 0) as string;
 		const credentials = await this.getCredentials('KissflowApi');
 
 		// For each item, make an API call
 		for (let i = 0; i < items.length; i++) {
 			switch (resource) {
 				case 'process':
+					// Gettin' operation from GUI
+					const processesOperations = this.getNodeParameter('processesOperations', 0) as string;
+
+					// Gettin' parameters from GUI
+					const processId = this.getNodeParameter('processId', i) as string;
+					const instanceId = this.getNodeParameter('instanceId', i) as string;
+
 					if (processesOperations === 'getItemDetails') {
-						// Get inputs's values
-						const processId = this.getNodeParameter('processId', i) as string;
-						const instanceId = this.getNodeParameter('instanceId', i) as string;
+						const reqResponse = await getItemDetails.call(this, processId, instanceId, credentials);
+						returnData.push(reqResponse);
+					}
 
-						// Make HTTP request according to https://api.kissflow.com/
-						const options: IRequestOptions = {
-							method: 'GET',
-							url: `https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/admin/${processId}/${instanceId}`,
-							encoding: 'arrayBuffer',
-						};
+					break;
+				case 'board':
+					// Gettin' operation from GUI
+					const boardsOperations = this.getNodeParameter('boardsOperations', 0) as string;
 
-						responseData = await this.helpers.requestWithAuthentication.call(
-							this,
-							'KissflowApi',
-							options,
-						);
+					// Gettin' parameters from GUI
+					const caseId = this.getNodeParameter('caseId', i) as string;
+					const itemId = this.getNodeParameter('itemId', i) as string;
 
-						console.log(responseData);
-
-						returnData.push(JSON.parse(responseData));
+					if (boardsOperations === 'getCardDetails') {
+						const reqResponse = await getCardDetails.call(this, caseId, itemId, credentials);
+						returnData.push(reqResponse);
 					}
 
 					break;
@@ -115,6 +113,7 @@ export class KissflowUnofficial implements INodeType {
 					break;
 			}
 		}
+
 		// Map data to n8n data structure
 		return [this.helpers.returnJsonArray(returnData)];
 	}
