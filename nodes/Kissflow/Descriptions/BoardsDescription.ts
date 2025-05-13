@@ -25,7 +25,7 @@ export const boardOperations: INodeProperties[] = [
 ];
 
 // operation's fields
-export const getCardDetailsOperation: INodeProperties[] = [
+export const boardDefaultFields: INodeProperties[] = [
 	{
 		displayName: 'Case ID',
 		name: 'caseId',
@@ -39,6 +39,8 @@ export const getCardDetailsOperation: INodeProperties[] = [
 		type: 'string',
 		required: true,
 	},
+];
+export const getCardDetailsOperation: INodeProperties[] = [
 	{
 		displayName: 'Item ID',
 		name: 'itemId',
@@ -56,4 +58,4 @@ export const getCardDetailsOperation: INodeProperties[] = [
 ];
 
 // Exporting all fields
-export const boardFields: INodeProperties[] = [...getCardDetailsOperation];
+export const boardFields: INodeProperties[] = [...boardDefaultFields, ...getCardDetailsOperation];

@@ -1,4 +1,5 @@
 import {
+	AssignmentCollectionValue,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeType,
@@ -6,7 +7,7 @@ import {
 	NodeConnectionType,
 } from 'n8n-workflow';
 import { processFields, processOperations } from './Descriptions/ProcessesDescription';
-import { getItemDetails } from '../../utils/processController';
+import { createItem, getItemDetails, submitItem } from '../../utils/processController';
 import { getCardDetails } from '../../utils/boardController';
 import { boardOperations, boardFields } from './Descriptions/BoardsDescription';
 
@@ -87,10 +88,60 @@ export class KissflowUnofficial implements INodeType {
 
 					// Gettin' parameters from GUI
 					const processId = this.getNodeParameter('processId', i) as string;
-					const instanceId = this.getNodeParameter('instanceId', i) as string;
 
 					if (processesOperations === 'getItemDetails') {
+						const instanceId = this.getNodeParameter('instanceId', i) as string;
+
 						const reqResponse = await getItemDetails.call(this, processId, instanceId, credentials);
+						returnData.push(reqResponse);
+					}
+
+					if (processesOperations === 'createItem') {
+						const autoSubmit = this.getNodeParameter('autoSubmit', i) as boolean;
+
+						const itemDetailsCollection = this.getNodeParameter(
+							'itemDetails',
+							i,
+						) as AssignmentCollectionValue;
+						let itemDetails: { [key: string]: string } = {};
+						for (const obj of itemDetailsCollection.assignments) {
+							itemDetails[obj.name as string] = obj.value as string;
+						}
+
+						let reqResponse;
+
+						const createResponse = await createItem.call(this, processId, itemDetails, credentials);
+						reqResponse = createResponse;
+
+						if (autoSubmit) {
+							const activityInstanceId = createResponse._activity_instance_id as string;
+							const instanceId = createResponse._id as string;
+
+							const submitResponse = await submitItem.call(
+								this,
+								processId,
+								instanceId,
+								activityInstanceId,
+								credentials,
+							);
+
+							reqResponse = submitResponse;
+						}
+
+						returnData.push(reqResponse);
+					}
+
+					if (processesOperations === 'submitItem') {
+						const instanceId = this.getNodeParameter('instanceId', i) as string;
+						const activityInstanceId = this.getNodeParameter('activityInstanceId', i) as string;
+
+						const reqResponse = await submitItem.call(
+							this,
+							processId,
+							instanceId,
+							activityInstanceId,
+							credentials,
+						);
 						returnData.push(reqResponse);
 					}
 

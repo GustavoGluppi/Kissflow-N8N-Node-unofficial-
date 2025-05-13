@@ -23,7 +23,6 @@ export async function getCardDetails(
 		'KissflowApi',
 		options,
 	);
-	console.log(responseData);
 
 	return JSON.parse(responseData) as IDataObject;
 }
