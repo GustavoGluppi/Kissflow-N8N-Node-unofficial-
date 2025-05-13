@@ -42,7 +42,9 @@ export class KissflowUnofficial implements INodeType {
 			},
 		},
 		*/
+		// Creating node's fields
 		properties: [
+			// Resource (main) field
 			{
 				displayName: 'Resource',
 				name: 'resource',
@@ -50,11 +52,11 @@ export class KissflowUnofficial implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Process',
+						name: '📙 Process Action',
 						value: 'process',
 					},
 					{
-						name: 'Board',
+						name: '🪟 Board Action',
 						value: 'board',
 					},
 				],
@@ -62,6 +64,7 @@ export class KissflowUnofficial implements INodeType {
 				required: true,
 			},
 
+			// "Process Action" fields
 			...processOperations,
 			...processFields,
 		],
@@ -71,39 +74,45 @@ export class KissflowUnofficial implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		// Handle data coming from previous nodes
 		const items = this.getInputData();
+
 		let responseData;
 		const returnData = [];
+
+		// Gettin' parameters from GUI
 		const resource = this.getNodeParameter('resource', 0) as string;
-
 		const processesOperations = this.getNodeParameter('processesOperations', 0) as string;
-
 		const credentials = await this.getCredentials('KissflowApi');
 
 		// For each item, make an API call
 		for (let i = 0; i < items.length; i++) {
-			if (resource === 'process') {
-				if (processesOperations === 'getItemDetails') {
-					// Get inputs's values
-					const processId = this.getNodeParameter('processId', i) as string;
-					const instanceId = this.getNodeParameter('instanceId', i) as string;
+			switch (resource) {
+				case 'process':
+					if (processesOperations === 'getItemDetails') {
+						// Get inputs's values
+						const processId = this.getNodeParameter('processId', i) as string;
+						const instanceId = this.getNodeParameter('instanceId', i) as string;
 
-					// Make HTTP request according to https://api.kissflow.com/
-					const options: IRequestOptions = {
-						method: 'GET',
-						url: `https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/admin/${processId}/${instanceId}`,
-						encoding: 'arrayBuffer',
-					};
+						// Make HTTP request according to https://api.kissflow.com/
+						const options: IRequestOptions = {
+							method: 'GET',
+							url: `https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/admin/${processId}/${instanceId}`,
+							encoding: 'arrayBuffer',
+						};
 
-					responseData = await this.helpers.requestWithAuthentication.call(
-						this,
-						'KissflowApi',
-						options,
-					);
+						responseData = await this.helpers.requestWithAuthentication.call(
+							this,
+							'KissflowApi',
+							options,
+						);
 
-					console.log(responseData);
+						console.log(responseData);
 
-					returnData.push(JSON.parse(responseData));
-				}
+						returnData.push(JSON.parse(responseData));
+					}
+
+					break;
+				default:
+					break;
 			}
 		}
 		// Map data to n8n data structure
