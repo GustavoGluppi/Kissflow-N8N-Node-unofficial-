@@ -31,6 +31,13 @@ export const processOperations: INodeProperties[] = [
 				description: 'Submits an item in a workflow step of your process',
 				action: 'Submit item',
 			},
+			{
+				name: 'Update Item Details',
+				value: 'updateItem',
+				description:
+					'Updates the records of a specific item in your process. Only Process Admins can call this endpoint.',
+				action: 'Update item',
+			},
 		],
 		default: 'getItemDetails',
 	},
@@ -84,7 +91,7 @@ export const createItemOperation: INodeProperties[] = [
 		required: true,
 	},
 	{
-		displayName: 'Item Details',
+		displayName: 'Item Body',
 		name: 'itemDetails',
 		type: 'assignmentCollection',
 		default: {},
@@ -128,6 +135,36 @@ export const submitItemOperation: INodeProperties[] = [
 		required: true,
 	},
 ];
+export const updateItemOperation: INodeProperties[] = [
+	{
+		displayName: 'Instance ID',
+		name: 'instanceId',
+		default: '',
+		description: "The item's unique identifier",
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['updateItem'],
+			},
+		},
+		type: 'string',
+		required: true,
+	},
+	{
+		displayName: 'Item Body',
+		name: 'itemDetails',
+		type: 'assignmentCollection',
+		default: {},
+		description: 'Input details of the item you want to create',
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['updateItem'],
+			},
+		},
+		required: true,
+	},
+];
 
 // Exporting all fields
 export const processFields: INodeProperties[] = [
@@ -135,4 +172,14 @@ export const processFields: INodeProperties[] = [
 	...getItemDetailsOperation,
 	...createItemOperation,
 	...submitItemOperation,
+	...updateItemOperation,
 ];
+
+/*
+ TO-DO:
+
+ - "Add attaachment to a form field (Admin)" operation
+ - "Download attachment from a form field" operation
+ - "Get all items (Admin)" operation
+ - Pull form fields
+*/

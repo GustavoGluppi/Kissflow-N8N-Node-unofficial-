@@ -7,8 +7,9 @@ import {
 	NodeConnectionType,
 } from 'n8n-workflow';
 import { processFields, processOperations } from './Descriptions/ProcessesDescription';
-import { createItem, getItemDetails, submitItem } from '../../utils/processController';
-import { getCardDetails } from '../../utils/boardController';
+import { createItem, getItemDetails, submitItem, updateItem } from '../../utils/processController';
+import { createCard, getCardDetails } from '../../utils/boardController';
+import { formatAssignmentCollection } from '../../utils/formatAssignmentCollection';
 import { boardOperations, boardFields } from './Descriptions/BoardsDescription';
 
 // Creating node UI and logic
@@ -99,18 +100,17 @@ export class KissflowUnofficial implements INodeType {
 					if (processesOperations === 'createItem') {
 						const autoSubmit = this.getNodeParameter('autoSubmit', i) as boolean;
 
-						const itemDetailsCollection = this.getNodeParameter(
-							'itemDetails',
-							i,
-						) as AssignmentCollectionValue;
-						let itemDetails: { [key: string]: string } = {};
-						for (const obj of itemDetailsCollection.assignments) {
-							itemDetails[obj.name as string] = obj.value as string;
-						}
+						let itemDetails = this.getNodeParameter('itemDetails', i);
+						itemDetails = formatAssignmentCollection(itemDetails as AssignmentCollectionValue);
 
 						let reqResponse;
 
-						const createResponse = await createItem.call(this, processId, itemDetails, credentials);
+						const createResponse = await createItem.call(
+							this,
+							processId,
+							itemDetails as { [key: string]: string },
+							credentials,
+						);
 						reqResponse = createResponse;
 
 						if (autoSubmit) {
@@ -145,6 +145,23 @@ export class KissflowUnofficial implements INodeType {
 						returnData.push(reqResponse);
 					}
 
+					if (processesOperations === 'updateItem') {
+						const instanceId = this.getNodeParameter('instanceId', i) as string;
+
+						let itemDetails = this.getNodeParameter('itemDetails', i);
+						itemDetails = formatAssignmentCollection(itemDetails as AssignmentCollectionValue);
+
+						const reqResponse = await updateItem.call(
+							this,
+							processId,
+							instanceId,
+							itemDetails as { [key: string]: string },
+							credentials,
+						);
+
+						returnData.push(reqResponse);
+					}
+
 					break;
 				case 'board':
 					// Gettin' operation from GUI
@@ -152,10 +169,24 @@ export class KissflowUnofficial implements INodeType {
 
 					// Gettin' parameters from GUI
 					const caseId = this.getNodeParameter('caseId', i) as string;
-					const itemId = this.getNodeParameter('itemId', i) as string;
 
 					if (boardsOperations === 'getCardDetails') {
+						const itemId = this.getNodeParameter('itemId', i) as string;
+
 						const reqResponse = await getCardDetails.call(this, caseId, itemId, credentials);
+						returnData.push(reqResponse);
+					}
+
+					if (boardsOperations === 'createCard') {
+						let itemDetails = this.getNodeParameter('itemDetails', i);
+						itemDetails = formatAssignmentCollection(itemDetails as AssignmentCollectionValue);
+
+						const reqResponse = await createCard.call(
+							this,
+							caseId,
+							itemDetails as { [key: string]: string },
+							credentials,
+						);
 						returnData.push(reqResponse);
 					}
 
