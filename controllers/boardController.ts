@@ -49,3 +49,31 @@ export async function createCard(
 
 	return JSON.parse(responseData) as IDataObject;
 }
+
+export async function updateCardStatus(
+	this: IExecuteFunctions,
+	caseId: string,
+	itemId: string,
+	statusId: string,
+	credentials: ICredentialDataDecryptedObject,
+): Promise<IDataObject> {
+	// Make HTTP request according to https://api.kissflow.com/
+
+	const cardDetails = await getCardDetails.call(this, caseId, itemId, credentials);
+	const actualStatus = cardDetails._status_id;
+
+	const options: IRequestOptions = {
+		method: 'POST',
+		body: JSON.stringify({ _status_id: statusId }),
+		url: `https://${credentials['subdomain']}.kissflow.com/case/2/${credentials['accountId']}/${caseId}/${itemId}/${actualStatus}/move`,
+		encoding: 'arrayBuffer',
+	};
+
+	const responseData = await this.helpers.requestWithAuthentication.call(
+		this,
+		'KissflowApi',
+		options,
+	);
+
+	return JSON.parse(responseData) as IDataObject;
+}

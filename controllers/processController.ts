@@ -187,10 +187,6 @@ export async function deleteItem(
 		encoding: 'arrayBuffer',
 	};
 
-	console.log(
-		`https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/admin/${processId}/${instanceId}`,
-	);
-
 	const responseData = await this.helpers.requestWithAuthentication.call(
 		this,
 		'KissflowApi',

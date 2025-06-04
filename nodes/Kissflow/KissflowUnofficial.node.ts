@@ -6,7 +6,7 @@ import {
 	INodeTypeDescription,
 	NodeConnectionType,
 } from 'n8n-workflow';
-import { processFields, processOperations } from './Descriptions/ProcessesDescription';
+import { processFields, processOperations } from './descriptions/ProcessesDescription';
 import {
 	createItem,
 	deleteItem,
@@ -16,10 +16,10 @@ import {
 	rejectItem,
 	submitItem,
 	updateItem,
-} from '../../utils/processController';
-import { createCard, getCardDetails } from '../../utils/boardController';
+} from '../../controllers/processController';
+import { createCard, getCardDetails, updateCardStatus } from '../../controllers/boardController';
 import { formatAssignmentCollection } from '../../utils/formatAssignmentCollection';
-import { boardOperations, boardFields } from './Descriptions/BoardsDescription';
+import { boardOperations, boardFields } from './descriptions/BoardsDescription';
 
 // Creating node UI and logic
 export class KissflowUnofficial implements INodeType {
@@ -247,6 +247,20 @@ export class KissflowUnofficial implements INodeType {
 							this,
 							caseId,
 							itemDetails as { [key: string]: string },
+							credentials,
+						);
+						returnData.push(reqResponse);
+					}
+
+					if (boardsOperations === 'updateStatusCard') {
+						const itemId = this.getNodeParameter('itemId', i) as string;
+						const statusId = this.getNodeParameter('statusId', i) as string;
+
+						const reqResponse = await updateCardStatus.call(
+							this,
+							caseId,
+							itemId,
+							statusId,
 							credentials,
 						);
 						returnData.push(reqResponse);

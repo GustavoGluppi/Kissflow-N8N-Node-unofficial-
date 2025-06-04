@@ -25,6 +25,12 @@ export const boardOperations: INodeProperties[] = [
 				description: 'Creates a new item in the board',
 				action: 'Create card',
 			},
+			{
+				name: 'Update the Status of an Item',
+				value: 'updateStatusCard',
+				description: 'Changes the status of a specific item in the board',
+				action: 'Update card status',
+			},
 		],
 		default: 'getCardDetails',
 	},
@@ -78,21 +84,48 @@ export const createCardOperation: INodeProperties[] = [
 		required: true,
 	},
 ];
+export const updateCardStatusOperation: INodeProperties[] = [
+	{
+		displayName: 'Item ID',
+		name: 'itemId',
+		default: '',
+		description: "The item's unique identifier",
+		displayOptions: {
+			show: {
+				resource: ['board'],
+				boardsOperations: ['updateStatusCard'],
+			},
+		},
+		type: 'string',
+		required: true,
+	},
+	{
+		displayName: 'Status ID',
+		name: 'statusId',
+		default: '',
+		description: 'The unique identifier for a status in the board',
+		displayOptions: {
+			show: {
+				resource: ['board'],
+				boardsOperations: ['updateStatusCard'],
+			},
+		},
+		type: 'string',
+		required: true,
+	},
+];
 
 // Exporting all fields
 export const boardFields: INodeProperties[] = [
 	...boardDefaultFields,
 	...getCardDetailsOperation,
 	...createCardOperation,
+	...updateCardStatusOperation,
 ];
 
-/*
- TO-DO:
-
- - "Update the status of an item" operation (auto complete?)
- - "Update custom form field" operation
- - "Get all items" operation
- - "Download an attachment from an attachment field" operation
- - "Upload an attachment to an attachment field" operation
- - Pull form fields
-*/
+// TODO: "Update the status of an item" operation (auto complete?)
+// TODO: "Update custom form field" operation
+// TODO: "Get all items" operation
+// TODO: "Download an attachment from an attachment field" operation
+// TODO: "Upload an attachment to an attachment field" operation
+// TODO: Pull form fields
