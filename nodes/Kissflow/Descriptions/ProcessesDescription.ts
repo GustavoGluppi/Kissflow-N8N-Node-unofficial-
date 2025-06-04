@@ -14,16 +14,42 @@ export const processOperations: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Create Item',
+				value: 'createItem',
+				description: 'Creates a new item request in your process',
+				action: 'Create item',
+			},
+			{
+				name: 'Delete Item',
+				value: 'deleteItem',
+				description: 'Deletes a specific item from your process',
+				action: 'Delete item',
+			},
+			{
+				name: 'Get All Items',
+				value: 'getAllItems',
+				// eslint-disable-next-line n8n-nodes-base/node-param-description-missing-final-period
+				description:
+					'Retrieves the list of all items from a process. Only Process Admins can call this endpoint',
+				action: 'Get all items',
+			},
+			{
 				name: 'Get Item Details',
 				value: 'getItemDetails',
 				description: 'Retrieves the details of a specific item from your process',
 				action: 'Get item details',
 			},
 			{
-				name: 'Create Item',
-				value: 'createItem',
-				description: 'Creates a new item request in your process',
-				action: 'Create item',
+				name: 'Get Progress Details',
+				value: 'getProgressDetails',
+				description: 'Retrieves the progress of a specific item in your process',
+				action: 'Get progress details',
+			},
+			{
+				name: 'Reject an Item',
+				value: 'rejectItem',
+				description: 'Rejects a specific item in a workflow step of your process',
+				action: 'Reject an item',
 			},
 			{
 				name: 'Submit Item',
@@ -34,8 +60,9 @@ export const processOperations: INodeProperties[] = [
 			{
 				name: 'Update Item Details',
 				value: 'updateItem',
+				// eslint-disable-next-line n8n-nodes-base/node-param-description-missing-final-period
 				description:
-					'Updates the records of a specific item in your process. Only Process Admins can call this endpoint.',
+					'Updates the records of a specific item in your process. Only Process Admins can call this endpoint',
 				action: 'Update item',
 			},
 		],
@@ -165,6 +192,141 @@ export const updateItemOperation: INodeProperties[] = [
 		required: true,
 	},
 ];
+export const rejectItemOperation: INodeProperties[] = [
+	{
+		displayName: 'Instance ID',
+		name: 'instanceId',
+		default: '',
+		description: "The item's unique identifier",
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['rejectItem'],
+			},
+		},
+		type: 'string',
+		required: true,
+	},
+	{
+		displayName: 'Activity Instance ID',
+		name: 'activityInstanceId',
+		default: '',
+		description: 'The unique identifier for each process step',
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['rejectItem'],
+			},
+		},
+		type: 'string',
+		required: true,
+	},
+	{
+		displayName: 'Note',
+		name: 'note',
+		default: '',
+		description: 'Additional notes for rejection',
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['rejectItem'],
+			},
+		},
+		type: 'string',
+		required: true,
+		typeOptions: {
+			rows: 4,
+		},
+	},
+];
+export const getProgressDetailsOperations: INodeProperties[] = [
+	{
+		displayName: 'Instance ID',
+		name: 'instanceId',
+		default: '',
+		description: "The item's unique identifier",
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['getProgressDetails'],
+			},
+		},
+		type: 'string',
+		required: true,
+	},
+];
+export const getAllItemsOperations: INodeProperties[] = [
+	{
+		displayName: 'Page Number',
+		name: 'pageNumber',
+		default: 1,
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-missing-final-period
+		description: 'The specific page number of an item list. It can be specified as 1, 2, 3, etc',
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['getAllItems'],
+			},
+		},
+		type: 'number',
+		typeOptions: {
+			minValue: 1,
+			numberPrecision: 0,
+		},
+		required: true,
+	},
+	{
+		displayName: 'Page Size',
+		name: 'pageSize',
+		default: 50,
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-missing-final-period
+		description: 'The number of items that can be listed in a page. It can be assigned any integer',
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['getAllItems'],
+			},
+		},
+		type: 'number',
+		typeOptions: {
+			minValue: 1,
+			numberPrecision: 0,
+		},
+		required: true,
+	},
+	{
+		displayName: 'Apply Preference',
+		name: 'applyPreference',
+		default: false,
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-missing-final-period, n8n-nodes-base/node-param-description-boolean-without-whether
+		description:
+			'The applied preferences like filters, show/hide fields, and number of rows per page',
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['getAllItems'],
+			},
+		},
+		type: 'boolean',
+		required: true,
+	},
+];
+export const deleteItemOperation: INodeProperties[] = [
+	{
+		displayName: 'Instance ID',
+		name: 'instanceId',
+		default: '',
+		description: "The item's unique identifier",
+		displayOptions: {
+			show: {
+				resource: ['process'],
+				processesOperations: ['deleteItem'],
+			},
+		},
+		type: 'string',
+		required: true,
+	},
+];
 
 // Exporting all fields
 export const processFields: INodeProperties[] = [
@@ -173,13 +335,12 @@ export const processFields: INodeProperties[] = [
 	...createItemOperation,
 	...submitItemOperation,
 	...updateItemOperation,
+	...rejectItemOperation,
+	...getProgressDetailsOperations,
+	...getAllItemsOperations,
+	...deleteItemOperation,
 ];
 
-/*
- TO-DO:
-
- - "Add attaachment to a form field (Admin)" operation
- - "Download attachment from a form field" operation
- - "Get all items (Admin)" operation
- - Pull form fields
-*/
+// TODO: "Add attaachment to a form field (Admin)" operation
+// TODO: "Download attachment from a form field" operation
+// TODO: Pull form fields

@@ -7,7 +7,16 @@ import {
 	NodeConnectionType,
 } from 'n8n-workflow';
 import { processFields, processOperations } from './Descriptions/ProcessesDescription';
-import { createItem, getItemDetails, submitItem, updateItem } from '../../utils/processController';
+import {
+	createItem,
+	deleteItem,
+	getAllItems,
+	getItemDetails,
+	getProgressDetails,
+	rejectItem,
+	submitItem,
+	updateItem,
+} from '../../utils/processController';
 import { createCard, getCardDetails } from '../../utils/boardController';
 import { formatAssignmentCollection } from '../../utils/formatAssignmentCollection';
 import { boardOperations, boardFields } from './Descriptions/BoardsDescription';
@@ -159,6 +168,59 @@ export class KissflowUnofficial implements INodeType {
 							credentials,
 						);
 
+						returnData.push(reqResponse);
+					}
+
+					if (processesOperations === 'rejectItem') {
+						const instanceId = this.getNodeParameter('instanceId', i) as string;
+						const activityInstanceId = this.getNodeParameter('activityInstanceId', i) as string;
+						const notes = this.getNodeParameter('note', i) as string;
+
+						const reqResponse = await rejectItem.call(
+							this,
+							processId,
+							instanceId,
+							activityInstanceId,
+							notes,
+							credentials,
+						);
+						returnData.push(reqResponse);
+					}
+
+					if (processesOperations === 'getProgressDetails') {
+						const instanceId = this.getNodeParameter('instanceId', i) as string;
+
+						const reqResponse = await getProgressDetails.call(
+							this,
+							processId,
+							instanceId,
+							credentials,
+						);
+
+						returnData.push(reqResponse);
+					}
+
+					if (processesOperations === 'getAllItems') {
+						const pageNumber = this.getNodeParameter('pageNumber', i) as number;
+						const pageSize = this.getNodeParameter('pageSize', i) as number;
+						const applyPreference = this.getNodeParameter('applyPreference', i) as boolean;
+
+						const reqResponse = await getAllItems.call(
+							this,
+							processId,
+							pageNumber,
+							pageSize,
+							applyPreference,
+							credentials,
+						);
+
+						returnData.push(reqResponse);
+					}
+
+					if (processesOperations === 'deleteItem') {
+						const instanceId = this.getNodeParameter('instanceId', i) as string;
+
+						const reqResponse = await deleteItem.call(this, processId, instanceId, credentials);
 						returnData.push(reqResponse);
 					}
 

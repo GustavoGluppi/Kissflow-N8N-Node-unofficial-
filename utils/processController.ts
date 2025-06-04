@@ -102,3 +102,100 @@ export async function updateItem(
 
 	return JSON.parse(responseData) as IDataObject;
 }
+
+export async function rejectItem(
+	this: IExecuteFunctions,
+	processId: string,
+	instanceId: string,
+	activityInstanceId: string,
+	notes: string,
+	credentials: ICredentialDataDecryptedObject,
+): Promise<IDataObject> {
+	// Make HTTP request according to https://api.kissflow.com/
+	const options: IRequestOptions = {
+		method: 'POST',
+		body: JSON.stringify({ Notes: notes }),
+		url: `https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/${processId}/${instanceId}/${activityInstanceId}/reject`,
+		encoding: 'arrayBuffer',
+	};
+
+	const responseData = await this.helpers.requestWithAuthentication.call(
+		this,
+		'KissflowApi',
+		options,
+	);
+
+	return JSON.parse(responseData) as IDataObject;
+}
+
+export async function getProgressDetails(
+	this: IExecuteFunctions,
+	processId: string,
+	instanceId: string,
+	credentials: ICredentialDataDecryptedObject,
+): Promise<IDataObject> {
+	// Make HTTP request according to https://api.kissflow.com/
+	const options: IRequestOptions = {
+		method: 'GET',
+		url: `https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/${processId}/${instanceId}/progress`,
+		encoding: 'arrayBuffer',
+	};
+
+	const responseData = await this.helpers.requestWithAuthentication.call(
+		this,
+		'KissflowApi',
+		options,
+	);
+
+	return JSON.parse(responseData) as IDataObject;
+}
+
+export async function getAllItems(
+	this: IExecuteFunctions,
+	processId: string,
+	pageNumber: number,
+	pageSize: number,
+	applyPreference: boolean,
+	credentials: ICredentialDataDecryptedObject,
+): Promise<IDataObject> {
+	// Make HTTP request according to https://api.kissflow.com/
+	const options: IRequestOptions = {
+		method: 'GET',
+		url: `https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/admin/${processId}/item?page_number=${pageNumber}&page_size=${pageSize}&apply_preference=${applyPreference}`,
+		encoding: 'arrayBuffer',
+	};
+
+	const responseData = await this.helpers.requestWithAuthentication.call(
+		this,
+		'KissflowApi',
+		options,
+	);
+
+	return JSON.parse(responseData) as IDataObject;
+}
+
+export async function deleteItem(
+	this: IExecuteFunctions,
+	processId: string,
+	instanceId: string,
+	credentials: ICredentialDataDecryptedObject,
+): Promise<IDataObject> {
+	// Make HTTP request according to https://api.kissflow.com/
+	const options: IRequestOptions = {
+		method: 'DELETE',
+		url: `https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/admin/${processId}/${instanceId}`,
+		encoding: 'arrayBuffer',
+	};
+
+	console.log(
+		`https://${credentials['subdomain']}.kissflow.com/process/2/${credentials['accountId']}/admin/${processId}/${instanceId}`,
+	);
+
+	const responseData = await this.helpers.requestWithAuthentication.call(
+		this,
+		'KissflowApi',
+		options,
+	);
+
+	return JSON.parse(responseData) as IDataObject;
+}
