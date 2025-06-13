@@ -1,7 +1,7 @@
 {
 	"name": "n8n-nodes-kissflowunofficial",
-	"version": "0.1.0",
-	"description": "",
+	"version": "0.1.3",
+	"description": "An unofficial n8n custom node for using Kissflow API",
 	"keywords": [
 		"n8n-community-node-package"
 	],
@@ -33,7 +33,7 @@
 			"dist/credentials/KissflowApi.credentials.js"
 		],
 		"nodes": [
-			"dist/nodes/Kissflow/KissflowUnofficial.node.ts"
+			"dist/nodes/Kissflow/KissflowUnofficial.node.js"
 		]
 	},
 	"devDependencies": {
